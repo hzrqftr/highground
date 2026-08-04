@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>highground — portal</title>
+    <link rel="icon" href="images/highground-icon.svg?v=1" type="image/svg+xml" sizes="any" />
+    <link rel="shortcut icon" href="images/highground-icon.svg?v=1" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      (function () {
+        var t = localStorage.getItem('hg-theme');
+        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      })();
+    </script>
+  </head>
+  <body>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+      <span class="theme-icon" id="theme-icon">○</span>
+      <span class="theme-label" id="theme-label">light mode</span>
+    </button>
+
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+          <div class="sidebar-header">
+            <div class="sidebar-brand">
+              <div class="brand-sigil">
+                <span class="brand-mark">HG</span>
+              </div>
+              <span class="brand-name">highground</span>
+            </div>
+          </div>
+
+          <nav class="sidebar-nav" aria-label="Main navigation">
+            <div class="nav-group">
+              <p class="nav-group-label">// pages</p>
+              <ul>
+                <li>
+                  <a href="index.html" class="nav-link home-link active" aria-current="page">
+                    <span class="nav-dot" aria-hidden="true"></span>
+                    <span class="nav-label">Home</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="nav-link">
+                    <span class="nav-dot"></span>
+                    <span class="nav-label">Draft Board</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="nav-link">
+                    <span class="nav-dot"></span>
+                    <span class="nav-label">Hero Notes</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="nav-link">
+                    <span class="nav-dot"></span>
+                    <span class="nav-label">Match Log</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="nav-link">
+                    <span class="nav-dot"></span>
+                    <span class="nav-label">Build Planner</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </aside>
+
+      <div class="main-area">
+        <header>
+          <div class="header-row">
+            <button class="sidebar-hamburger" id="sidebar-toggle" aria-label="Toggle sidebar">&#9776;</button>
+            <p class="page-path">~/highground<span class="path-sep">/</span><span class="path-active">home</span></p>
+          </div>
+          <h1>highground</h1>
+          <p class="subtitle">A Dota-inspired command center for tactical notes, builds, and match planning.</p>
+        </header>
+
+        <main class="portal">
+          <section class="panel portal-intro">
+            <p class="portal-kicker">// landing</p>
+            <h2>Build smarter plays.</h2>
+            <p>
+              This is the frontpage scaffold for highground. Keep the structure here while later features and tools are added
+              behind the scenes. For now, it serves as a clean hub for draft notes, heroes, builds, and planning.
+            </p>
+          </section>
+
+          <div class="portal-grid">
+            <a class="portal-card" href="#">
+              <span class="portal-card-tag">draft</span>
+              <h3>Draft Board</h3>
+              <p>Track hero picks, counterplay, and lane priorities before the match starts.</p>
+            </a>
+
+            <a class="portal-card" href="#">
+              <span class="portal-card-tag">analysis</span>
+              <h3>Hero Notes</h3>
+              <p>Keep role-specific notes, item timings, and matchup reminders in one convenient place.</p>
+            </a>
+
+            <a class="portal-card" href="#">
+              <span class="portal-card-tag">history</span>
+              <h3>Match Log</h3>
+              <p>Review past games, update tendencies, and capture lessons from every pub or ranked session.</p>
+            </a>
+
+            <a class="portal-card" href="#">
+              <span class="portal-card-tag">builds</span>
+              <h3>Build Planner</h3>
+              <p>Lay out item paths, skill priorities, and rune timing ideas for your next draft or queue.</p>
+            </a>
+          </div>
+        </main>
+
+        <footer>
+          <p>
+            Placeholder frontpage for the highground project. More modules and utilities will be added over time.
+          </p>
+          <span class="footer-badge" aria-label="Highground placeholder status">alpha</span>
+        </footer>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
