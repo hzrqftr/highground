@@ -331,7 +331,11 @@ footer p {
 }
 
 .portal-hero {
-  background: linear-gradient(135deg, var(--panel) 0%, var(--panel-hover) 100%);
+  background-image: url('assets/images/bg1-bnw.png');
+  background-color: var(--panel);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2.5rem;
@@ -350,8 +354,18 @@ footer p {
   width: 400px;
   height: 400px;
   background: radial-gradient(circle, var(--accent-primary), transparent);
-  opacity: 0.08;
+  opacity: 0;
   pointer-events: none;
+}
+
+.portal-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--panel);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-content {
