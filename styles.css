@@ -16,21 +16,6 @@
   --sidebar-w-sm: 56px;
 }
 
-[data-theme="light"] {
-  --bg: #fafbfc;
-  --bg-secondary: #f0f3f8;
-  --panel: #ffffff;
-  --panel-hover: #f5f7fa;
-  --sidebar-bg: #f3f5f8;
-  --border: #d1d9e0;
-  --text: #0d1117;
-  --text-muted: #57606a;
-  --accent-primary: #0077b6;
-  --accent-secondary: #fb5607;
-  --accent-dim: rgba(0, 119, 182, 0.08);
-  --shadow: rgba(0, 0, 0, 0.1);
-}
-
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -596,12 +581,6 @@ footer p {
     font-size: 1.2rem;
   }
 
-  .theme-toggle {
-    top: 1rem;
-    right: 1rem;
-    width: 36px;
-    height: 36px;
-  }
 }
 
 @media (max-width: 480px) {
