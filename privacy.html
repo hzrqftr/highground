@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy - Highground</title>
+    <link rel="icon" href="assets/icons/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="assets/icons/favicon.ico" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .legal-page {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+      .legal-page a.back-link {
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-size: 0.85rem;
+      }
+      .legal-page a.back-link:hover {
+        text-decoration: underline;
+      }
+      .legal-page h1 {
+        margin: 1.5rem 0 0.25rem;
+      }
+      .legal-page .updated {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-bottom: 2rem;
+      }
+      .legal-page h2 {
+        font-size: 1.05rem;
+        margin-top: 2rem;
+        color: var(--accent-primary);
+      }
+      .legal-page p, .legal-page li {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+      .legal-page a {
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="legal-page">
+      <a class="back-link" href="index.html">&larr; Back to Highground</a>
+      <h1>Privacy</h1>
+      <p class="updated">Last updated: August 2026</p>
+
+      <h2>What this page covers</h2>
+      <p>
+        Highground is a fan-made, non-commercial Dota 2 companion project. This page explains what happens to your
+        data when you use the "Sign in with Steam" feature. Nothing here applies to browsing the site without
+        signing in — that requires no data from you.
+      </p>
+
+      <h2>Signing in with Steam</h2>
+      <p>
+        Sign-in uses Steam's own OpenID login. You authenticate directly with Steam; Highground never sees, handles,
+        or stores your Steam password or credentials.
+      </p>
+      <p>
+        After you sign in, Steam confirms your identity and Highground fetches your public Steam profile
+        (SteamID, display name, and avatar) once, using the Steam Web API. That information is packaged into a
+        signed session token and sent back to your own browser.
+      </p>
+
+      <h2>What is stored, and where</h2>
+      <ul>
+        <li>The session token (containing your SteamID, display name, and avatar URL) is stored in your browser's
+          <code>localStorage</code> — on your device only.</li>
+        <li>Highground does not have a database and does not persist your profile data on any server.</li>
+        <li>The session token expires after 7 days. Signing out, or clearing your browser storage, removes it
+          immediately.</li>
+      </ul>
+
+      <h2>Who this is shared with</h2>
+      <p>
+        Your data isn't shared with third parties. The only outside call made on your behalf is to Valve's Steam
+        Web API, to fetch your public profile at sign-in.
+      </p>
+
+      <h2>Questions</h2>
+      <p>
+        This is a small hobby project, not a company. If you have questions about how sign-in works, check the
+        source in the project repository.
+      </p>
+    </div>
+  </body>
+</html>

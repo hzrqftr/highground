@@ -1,6 +1,6 @@
 (function () {
   // Local dev default (wrangler dev). Swap to the deployed Worker URL after `wrangler deploy`.
-  const WORKER_BASE_URL = 'http://localhost:8787';
+  const WORKER_BASE_URL = 'https://highground-steam-auth.hazriq-fitri95.workers.dev';
   const TOKEN_KEY = 'hg-steam-token';
 
   const signinBtn = document.getElementById('steam-signin-btn');

@@ -60,31 +60,29 @@
             </div>
           </nav>
 
-          <div class="sidebar-footer">
-            <button class="steam-signin-btn" id="steam-signin-btn" type="button">
-              <span class="nav-icon">🎮</span>
-              <span class="nav-label">Sign in with Steam</span>
-            </button>
-            <div class="steam-profile" id="steam-profile" hidden>
-              <img class="steam-avatar" id="steam-avatar" alt="" />
-              <span class="steam-name nav-label" id="steam-name"></span>
-              <button class="steam-signout-btn" id="steam-signout-btn" type="button" aria-label="Sign out" title="Sign out">×</button>
-            </div>
-          </div>
         </div>
       </aside>
 
       <div class="main-area">
-        <header>
-          <button class="sidebar-hamburger" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
-          <h1>Highground</h1>
-          <p class="subtitle">Your Dota 2 command center for smarter drafts and better builds.</p>
-        </header>
-
         <main class="portal">
           <section class="portal-hero">
+            <div class="hero-topbar">
+              <button class="sidebar-hamburger" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+              <div class="account-widget" id="account-widget">
+                <button class="steam-signin-btn" id="steam-signin-btn" type="button">
+                  <img class="steam-icon" src="assets/icons/steam-logo.svg" alt="" />
+                  <span>Sign in</span>
+                </button>
+                <div class="steam-profile" id="steam-profile" hidden>
+                  <img class="steam-avatar" id="steam-avatar" alt="" />
+                  <span class="steam-name" id="steam-name"></span>
+                  <button class="steam-signout-btn" id="steam-signout-btn" type="button" aria-label="Sign out" title="Sign out">×</button>
+                </div>
+              </div>
+            </div>
+
             <div class="hero-content">
-              <h2>Take the high ground</h2>
+              <h1>Take the high ground</h1>
               <p>Build your edge with tactical drafting, hero analysis, and item planning tools designed for competitive play.</p>
             </div>
           </section>
@@ -121,7 +119,14 @@
         </main>
 
         <footer>
-          <p>Highground is your competitive advantage. Alpha release coming soon.</p>
+          <div class="footer-text">
+            <p>Highground is your competitive advantage. Alpha release coming soon.</p>
+            <p class="footer-disclaimer">
+              Highground is an unofficial, non-commercial fan project and is not affiliated with, endorsed, or sponsored by Valve Corporation.
+              Dota, Dota 2, Steam, and associated logos are trademarks and/or registered trademarks of Valve Corporation.
+              Hero and item data are sourced from Valve's public Dota 2 assets. &middot; <a href="privacy.html">Privacy</a>
+            </p>
+          </div>
           <span class="footer-badge">alpha</span>
         </footer>
       </div>

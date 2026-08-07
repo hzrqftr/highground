@@ -129,7 +129,8 @@ body {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  background: transparent;
+  background: rgba(13, 17, 23, 0.55);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   color: var(--text-muted);
   border-radius: 6px;
@@ -235,29 +236,37 @@ body {
   margin-bottom: 0.3rem;
 }
 
-.sidebar-footer {
+/* Account widget (HUD chip, top-right of the hero banner) */
+.account-widget {
   flex-shrink: 0;
-  padding: 0.8rem 0.6rem;
-  border-top: 1px solid var(--border);
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .steam-signin-btn {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  background: transparent;
+  gap: 0.6rem;
+  padding: 0.55rem 1.1rem;
+  background: rgba(13, 17, 23, 0.55);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 20px;
   color: var(--text-muted);
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
+}
+
+/* Author rules above set display:flex, which otherwise beats the UA
+   stylesheet's [hidden] { display: none } regardless of specificity —
+   these overrides are what actually let steam-auth.js hide the elements. */
+.steam-signin-btn[hidden] {
+  display: none;
 }
 
 .steam-signin-btn:hover {
@@ -266,12 +275,27 @@ body {
   border-color: var(--accent-primary);
 }
 
+.steam-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: block;
+}
+
 .steam-profile {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.4rem 0.5rem;
+  padding: 0.3rem 0.6rem 0.3rem 0.3rem;
+  background: rgba(13, 17, 23, 0.55);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
   overflow: hidden;
+}
+
+.steam-profile[hidden] {
+  display: none;
 }
 
 .steam-avatar {
@@ -283,9 +307,10 @@ body {
 }
 
 .steam-name {
-  flex: 1;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--text);
   font-size: 0.82rem;
   font-weight: 600;
@@ -310,12 +335,6 @@ body {
   background: var(--accent-dim);
 }
 
-.sidebar.collapsed .steam-signin-btn .nav-label,
-.sidebar.collapsed .steam-name {
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* Main area */
 .main-area {
   flex: 1;
@@ -323,31 +342,6 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-header {
-  padding: 2rem 2.5rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-
-header h1 {
-  margin: 0 0 0.4rem;
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 400;
-  line-height: 1.5;
 }
 
 main {
@@ -368,9 +362,30 @@ footer {
   flex-wrap: wrap;
 }
 
+.footer-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
 footer p {
   margin: 0;
-  flex: 1;
+}
+
+.footer-disclaimer {
+  font-size: 0.7rem;
+  opacity: 0.75;
+  line-height: 1.5;
+}
+
+.footer-disclaimer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.footer-disclaimer a:hover {
+  color: var(--accent-primary);
 }
 
 .footer-badge {
@@ -404,12 +419,22 @@ footer p {
   background-repeat: no-repeat;
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 2.5rem;
-  min-height: 180px;
+  padding: 1.5rem 2.5rem 2.5rem;
+  min-height: 220px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   position: relative;
   overflow: hidden;
+}
+
+.hero-topbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .portal-hero::before {
@@ -440,12 +465,15 @@ footer p {
   max-width: 600px;
 }
 
-.portal-hero h2 {
+.portal-hero h1 {
   margin: 0 0 0.8rem;
-  font-size: 1.8rem;
+  font-size: 2.1rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--accent-primary);
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .portal-hero p {
@@ -572,14 +600,6 @@ footer p {
 
 /* Responsive */
 @media (max-width: 900px) {
-  header {
-    padding: 1.5rem 1.5rem 1rem;
-  }
-
-  header h1 {
-    font-size: 1.6rem;
-  }
-
   main {
     padding: 1.5rem;
   }
@@ -589,10 +609,10 @@ footer p {
   }
 
   .portal-hero {
-    padding: 1.5rem;
+    padding: 1rem 1.5rem 1.5rem;
   }
 
-  .portal-hero h2 {
+  .portal-hero h1 {
     font-size: 1.4rem;
   }
 }
@@ -634,20 +654,13 @@ footer p {
     display: flex;
   }
 
-  header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  header h1 {
-    font-size: 1.4rem;
-    margin: 0;
-  }
-
-  .subtitle {
+  .steam-signin-btn span:not(.steam-icon) {
     display: none;
+  }
+
+  .steam-signin-btn {
+    padding: 0.5rem;
+    border-radius: 50%;
   }
 
   .portal-grid {
@@ -655,29 +668,21 @@ footer p {
   }
 
   .portal-hero {
-    padding: 1.25rem;
+    padding: 1rem 1.25rem 1.25rem;
   }
 
-  .portal-hero h2 {
+  .portal-hero h1 {
     font-size: 1.2rem;
   }
 
 }
 
 @media (max-width: 480px) {
-  header {
-    padding: 0.75rem;
-  }
-
-  header h1 {
-    font-size: 1.2rem;
-  }
-
   main {
     padding: 1rem;
   }
 
-  .portal-hero h2 {
+  .portal-hero h1 {
     font-size: 1rem;
   }
 
