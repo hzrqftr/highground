@@ -16,7 +16,7 @@
 	],
 	"vars": {
 		"FRONTEND_ORIGIN": "https://hzrqftr.github.io",
-		"FRONTEND_REDIRECT_URL": "https://hzrqftr.github.io/highground/"
+		"FRONTEND_REDIRECT_URL": "https://hzrqftr.github.io/highground/dashboard.html"
 	}
 	/**
 	 * Smart Placement

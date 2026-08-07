@@ -1,0 +1,130 @@
+(function () {
+  const auth = window.HGAuth;
+
+  // No token at all -> bounce immediately, don't wait on the async session check.
+  if (!auth || !auth.getToken()) {
+    window.location.replace('index.html');
+    return;
+  }
+
+  const avatarEl = document.getElementById('dashboard-profile-avatar');
+  const nameEl = document.getElementById('dashboard-profile-name');
+  const steamidEl = document.getElementById('dashboard-profile-steamid');
+  const linkEl = document.getElementById('dashboard-profile-link');
+
+  const matchesList = document.getElementById('matches-list');
+  const matchesLoading = document.getElementById('matches-loading');
+  const matchesEmpty = document.getElementById('matches-empty');
+  const matchesError = document.getElementById('matches-error');
+
+  let heroesById = null;
+  async function loadHeroes() {
+    if (heroesById) return heroesById;
+    try {
+      const res = await fetch('data/heroes.json');
+      const heroes = await res.json();
+      heroesById = new Map(heroes.map((h) => [h.id, h]));
+    } catch {
+      heroesById = new Map();
+    }
+    return heroesById;
+  }
+
+  function formatDuration(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  function formatRelativeTime(unixSeconds) {
+    const diffMs = Date.now() - unixSeconds * 1000;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHours < 1) return 'less than an hour ago';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
+  }
+
+  function isWin(match) {
+    const isRadiant = match.player_slot < 128;
+    return isRadiant === match.radiant_win;
+  }
+
+  async function renderMatches(matches) {
+    const heroes = await loadHeroes();
+    matchesLoading.hidden = true;
+
+    if (!matches.length) {
+      matchesEmpty.hidden = false;
+      return;
+    }
+
+    matchesList.innerHTML = '';
+    for (const match of matches) {
+      const hero = heroes.get(match.hero_id);
+      const win = isWin(match);
+
+      const li = document.createElement('li');
+      li.className = `match-row ${win ? 'match-win' : 'match-loss'}`;
+
+      const heroIcon = document.createElement('img');
+      heroIcon.className = 'match-hero-icon';
+      heroIcon.alt = hero?.localized_name || `Hero ${match.hero_id}`;
+      heroIcon.addEventListener('error', () => heroIcon.replaceWith(Object.assign(document.createElement('span'), { className: 'match-hero-icon match-hero-icon-fallback', textContent: '🛡️' })), { once: true });
+      heroIcon.src = hero?.icon || '';
+
+      const heroName = document.createElement('span');
+      heroName.className = 'match-hero-name';
+      heroName.textContent = hero?.localized_name || `Hero ${match.hero_id}`;
+
+      const result = document.createElement('span');
+      result.className = 'match-result';
+      result.textContent = win ? 'Win' : 'Loss';
+
+      const kda = document.createElement('span');
+      kda.className = 'match-kda';
+      kda.textContent = `${match.kills}/${match.deaths}/${match.assists}`;
+
+      const duration = document.createElement('span');
+      duration.className = 'match-duration';
+      duration.textContent = formatDuration(match.duration);
+
+      const time = document.createElement('span');
+      time.className = 'match-time';
+      time.textContent = formatRelativeTime(match.start_time);
+
+      li.append(heroIcon, heroName, result, kda, duration, time);
+      matchesList.appendChild(li);
+    }
+    matchesList.hidden = false;
+  }
+
+  async function fetchMatches(token) {
+    try {
+      const res = await fetch(`${auth.workerBaseUrl}/dota/recent-matches`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('request failed');
+      const data = await res.json();
+      await renderMatches(data.matches || []);
+    } catch {
+      matchesLoading.hidden = true;
+      matchesError.hidden = false;
+    }
+  }
+
+  function renderProfile(profile) {
+    avatarEl.src = profile.avatar || '';
+    nameEl.textContent = profile.personaname || profile.steamid;
+    steamidEl.textContent = `SteamID: ${profile.steamid}`;
+    linkEl.href = `https://steamcommunity.com/profiles/${profile.steamid}`;
+  }
+
+  auth.onChange(({ signedIn, profile }) => {
+    if (!signedIn) {
+      window.location.replace('index.html');
+      return;
+    }
+    renderProfile(profile);
+    fetchMatches(auth.getToken());
+  });
+})();

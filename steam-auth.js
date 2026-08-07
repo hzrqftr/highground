@@ -8,6 +8,18 @@
   const avatarEl = document.getElementById('steam-avatar');
   const nameEl = document.getElementById('steam-name');
   const signoutBtn = document.getElementById('steam-signout-btn');
+  const dashboardNavLink = document.getElementById('dashboard-nav-link');
+
+  const listeners = [];
+  function notifyChange(signedIn, profile) {
+    for (const cb of listeners) {
+      try {
+        cb({ signedIn, profile: profile || null });
+      } catch {
+        // listener errors shouldn't break auth state handling
+      }
+    }
+  }
 
   function consumeTokenFromUrl() {
     const match = window.location.hash.match(/(?:^#|&)token=([^&]+)/);
@@ -19,6 +31,8 @@
   function showSignedOut() {
     if (signinBtn) signinBtn.hidden = false;
     if (profileEl) profileEl.hidden = true;
+    if (dashboardNavLink) dashboardNavLink.hidden = true;
+    notifyChange(false, null);
   }
 
   function showSignedIn(profile) {
@@ -26,6 +40,8 @@
     if (profileEl) profileEl.hidden = false;
     if (avatarEl) avatarEl.src = profile.avatar || '';
     if (nameEl) nameEl.textContent = profile.personaname || profile.steamid;
+    if (dashboardNavLink) dashboardNavLink.hidden = false;
+    notifyChange(true, profile);
   }
 
   async function refreshSession() {
@@ -57,4 +73,12 @@
     localStorage.removeItem(TOKEN_KEY);
     showSignedOut();
   });
+
+  window.HGAuth = {
+    workerBaseUrl: WORKER_BASE_URL,
+    getToken: () => localStorage.getItem(TOKEN_KEY),
+    onChange: (cb) => {
+      listeners.push(cb);
+    },
+  };
 })();

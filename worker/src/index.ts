@@ -131,6 +131,73 @@ async function handleMe(request: Request, env: Env): Promise<Response> {
 	}
 }
 
+// Steam64 -> Steam32 (Dota match APIs key off the 32-bit account id)
+function steamIdToAccountId(steamid: string): string {
+	return (BigInt(steamid) - 76561197960265728n).toString();
+}
+
+interface OpenDotaRecentMatch {
+	match_id: number;
+	hero_id: number;
+	kills: number;
+	deaths: number;
+	assists: number;
+	duration: number;
+	game_mode: number;
+	player_slot: number;
+	radiant_win: boolean;
+	start_time: number;
+}
+
+const RECENT_MATCHES_LIMIT = 5;
+
+async function handleRecentMatches(request: Request, env: Env): Promise<Response> {
+	const headers = corsHeaders(env.FRONTEND_ORIGIN);
+	const auth = request.headers.get('Authorization');
+	const token = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+
+	if (!token) {
+		return json({ error: 'missing bearer token' }, { status: 401, headers });
+	}
+
+	let steamid: string;
+	try {
+		const { payload } = await jwtVerify(token, new TextEncoder().encode(env.JWT_SECRET));
+		steamid = String(payload.steamid);
+	} catch {
+		return json({ error: 'invalid or expired token' }, { status: 401, headers });
+	}
+
+	const accountId = steamIdToAccountId(steamid);
+	const response = await fetch(
+		`https://api.opendota.com/api/players/${accountId}/recentMatches`,
+	);
+
+	if (!response.ok) {
+		return json({ matches: [] }, { headers });
+	}
+
+	const matches = (await response.json()) as OpenDotaRecentMatch[];
+	if (!Array.isArray(matches)) {
+		return json({ matches: [] }, { headers });
+	}
+
+	const trimmed = matches.slice(0, RECENT_MATCHES_LIMIT).map((m) => ({
+		match_id: m.match_id,
+		hero_id: m.hero_id,
+		kills: m.kills,
+		deaths: m.deaths,
+		assists: m.assists,
+		duration: m.duration,
+		game_mode: m.game_mode,
+		player_slot: m.player_slot,
+		radiant_win: m.radiant_win,
+		start_time: m.start_time,
+	}));
+
+	return json({ matches: trimmed }, { headers });
+}
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
@@ -147,6 +214,9 @@ export default {
 		}
 		if (url.pathname === '/auth/me') {
 			return handleMe(request, env);
+		}
+		if (url.pathname === '/dota/recent-matches') {
+			return handleRecentMatches(request, env);
 		}
 
 		return new Response('Not found', { status: 404 });

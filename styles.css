@@ -193,6 +193,13 @@ body {
   padding: 0 0.6rem;
 }
 
+/* Author rules below set display:flex, which otherwise beats the UA
+   stylesheet's [hidden] { display: none } regardless of specificity —
+   this override is what lets steam-auth.js hide the gated Dashboard link. */
+.nav-link[hidden] {
+  display: none;
+}
+
 .nav-link {
   display: flex;
   align-items: center;
@@ -564,6 +571,153 @@ footer p {
 .portal-card:hover .card-cta {
   background: var(--accent-primary);
   color: var(--bg);
+}
+
+/* Dashboard: profile summary */
+.dashboard-hero .hero-content {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: none;
+}
+
+.dashboard-profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.dashboard-profile-info h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.dashboard-profile-steamid {
+  margin: 0 0 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.dashboard-profile-link {
+  color: var(--accent-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dashboard-profile-link:hover {
+  text-decoration: underline;
+}
+
+/* Dashboard: recent matches */
+.matches-section {
+  margin-top: 1.75rem;
+}
+
+.matches-heading {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.matches-status {
+  margin: 0;
+  padding: 1.25rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.matches-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.matches-list[hidden] {
+  display: none;
+}
+
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.85rem;
+}
+
+.match-row.match-win {
+  border-left-color: var(--accent-primary);
+}
+
+.match-row.match-loss {
+  border-left-color: var(--accent-secondary);
+}
+
+.match-hero-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  object-fit: cover;
+}
+
+.match-hero-icon-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.match-hero-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-result {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.match-row.match-win .match-result {
+  color: var(--accent-primary);
+}
+
+.match-row.match-loss .match-result {
+  color: var(--accent-secondary);
+}
+
+.match-kda {
+  color: var(--text-muted);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8rem;
+}
+
+.match-duration,
+.match-time {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  white-space: nowrap;
 }
 
 /* Theme toggle */
