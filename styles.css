@@ -235,6 +235,87 @@ body {
   margin-bottom: 0.3rem;
 }
 
+.sidebar-footer {
+  flex-shrink: 0;
+  padding: 0.8rem 0.6rem;
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.steam-signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.steam-signin-btn:hover {
+  color: var(--accent-primary);
+  background: var(--accent-dim);
+  border-color: var(--accent-primary);
+}
+
+.steam-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  overflow: hidden;
+}
+
+.steam-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.steam-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.steam-signout-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.steam-signout-btn:hover {
+  color: var(--accent-secondary);
+  background: var(--accent-dim);
+}
+
+.sidebar.collapsed .steam-signin-btn .nav-label,
+.sidebar.collapsed .steam-name {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Main area */
 .main-area {
   flex: 1;

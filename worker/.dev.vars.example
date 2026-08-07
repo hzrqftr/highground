@@ -1,0 +1,2 @@
+STEAM_API_KEY=your_steam_web_api_key_here
+JWT_SECRET=a_long_random_string_used_to_sign_session_tokens

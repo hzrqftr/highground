@@ -59,6 +59,18 @@
               </ul>
             </div>
           </nav>
+
+          <div class="sidebar-footer">
+            <button class="steam-signin-btn" id="steam-signin-btn" type="button">
+              <span class="nav-icon">🎮</span>
+              <span class="nav-label">Sign in with Steam</span>
+            </button>
+            <div class="steam-profile" id="steam-profile" hidden>
+              <img class="steam-avatar" id="steam-avatar" alt="" />
+              <span class="steam-name nav-label" id="steam-name"></span>
+              <button class="steam-signout-btn" id="steam-signout-btn" type="button" aria-label="Sign out" title="Sign out">×</button>
+            </div>
+          </div>
         </div>
       </aside>
 
@@ -116,5 +128,6 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="steam-auth.js"></script>
   </body>
 </html>
