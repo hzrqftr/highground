@@ -15,6 +15,14 @@
   const matchesEmpty = document.getElementById('matches-empty');
   const matchesError = document.getElementById('matches-error');
 
+  const statsGrid = document.getElementById('stats-grid');
+  const statsLoading = document.getElementById('stats-loading');
+  const statsEmpty = document.getElementById('stats-empty');
+  const statsError = document.getElementById('stats-error');
+  const statWinrate = document.getElementById('stat-winrate');
+  const statKda = document.getElementById('stat-kda');
+  const statRole = document.getElementById('stat-role');
+
   let heroesById = null;
   async function loadHeroes() {
     if (heroesById) return heroesById;
@@ -110,6 +118,34 @@
     }
   }
 
+  function renderStats(stats) {
+    statsLoading.hidden = true;
+
+    if (stats.win_rate === null) {
+      statsEmpty.hidden = false;
+      return;
+    }
+
+    statWinrate.textContent = `${(stats.win_rate * 100).toFixed(1)}%`;
+    statKda.textContent = `${Math.round(stats.avg_kills)}/${Math.round(stats.avg_deaths)}/${Math.round(stats.avg_assists)}`;
+    statRole.textContent = stats.preferred_role ?? 'Not enough data';
+    statsGrid.hidden = false;
+  }
+
+  async function fetchStats(token) {
+    try {
+      const res = await fetch(`${auth.workerBaseUrl}/dota/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('request failed');
+      const data = await res.json();
+      renderStats(data);
+    } catch {
+      statsLoading.hidden = true;
+      statsError.hidden = false;
+    }
+  }
+
   function renderProfile(profile) {
     avatarEl.src = profile.avatar || '';
     nameEl.textContent = profile.personaname || profile.steamid;
@@ -123,6 +159,7 @@
       return;
     }
     renderProfile(profile);
+    fetchStats(auth.getToken());
     fetchMatches(auth.getToken());
   });
 })();

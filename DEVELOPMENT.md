@@ -107,3 +107,12 @@ Not part of local testing, but: once changes are committed and pushed to
 `.github/workflows/deploy-worker.yml`, only when `worker/**` changed) both
 deploy automatically. No manual `wrangler deploy` needed in the normal
 cycle.
+
+- **D1 migrations do run as part of that automation** — the workflow
+  applies `wrangler d1 migrations apply highground-player-stats --remote`
+  before `wrangler deploy`, so any new migration in `worker/migrations/`
+  reaches production automatically on push. `wrangler d1 migrations apply
+  --local` (used during local dev) only ever touches your machine's local
+  simulated DB and has no effect on the remote one — if you want to check
+  the real remote schema/data yourself, use the same command with
+  `--remote` instead of `--local`.

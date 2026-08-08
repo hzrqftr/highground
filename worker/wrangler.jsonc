@@ -17,7 +17,15 @@
 	"vars": {
 		"FRONTEND_ORIGIN": "https://hzrqftr.github.io",
 		"FRONTEND_REDIRECT_URL": "https://hzrqftr.github.io/highground/dashboard.html"
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "highground-player-stats",
+			"database_id": "0f65bd4a-35fd-4fcb-b4d2-6a990cd2a00e",
+			"migrations_dir": "./migrations"
+		}
+	]
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

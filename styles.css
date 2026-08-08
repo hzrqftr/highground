@@ -556,6 +556,11 @@ main {
   background-image: none;
   min-height: 0;
   padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
 }
 
 .dashboard-hero::after {
@@ -567,6 +572,20 @@ main {
   align-items: center;
   gap: 1.25rem;
   max-width: none;
+}
+
+.dashboard-hero-stats {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.dashboard-hero-stats .matches-status {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  max-width: 22ch;
+  margin-left: auto;
 }
 
 .dashboard-profile-avatar {
@@ -616,6 +635,44 @@ main {
   border-radius: 12px;
   color: var(--text-muted);
   font-size: 0.88rem;
+}
+
+.stats-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.stats-line[hidden] {
+  display: none;
+}
+
+.stat-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.stat-sep {
+  color: var(--border);
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
 }
 
 .matches-list {
@@ -821,10 +878,29 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .dashboard-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .dashboard-hero .hero-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+
+  .dashboard-hero-stats {
+    align-self: stretch;
+    text-align: left;
+  }
+
+  .dashboard-hero-stats .matches-status {
+    margin-left: 0;
+  }
+
+  .stats-line {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .match-row {

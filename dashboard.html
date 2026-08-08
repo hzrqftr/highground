@@ -81,6 +81,29 @@
             <a class="dashboard-profile-link" id="dashboard-profile-link" href="#" target="_blank" rel="noopener">View Steam profile</a>
           </div>
         </div>
+
+        <div class="dashboard-hero-stats">
+          <p class="matches-status" id="stats-loading">Loading stats&hellip;</p>
+          <p class="matches-status" id="stats-empty" hidden>No stats available yet. Make sure "Expose Public Match Data" is enabled in your Dota 2 settings.</p>
+          <p class="matches-status" id="stats-error" hidden>Couldn't load stats right now. Try refreshing the page.</p>
+
+          <div class="stats-line" id="stats-grid" hidden>
+            <span class="stat-item">
+              <span class="stat-label">Win Rate</span>
+              <span class="stat-value" id="stat-winrate">&mdash;</span>
+            </span>
+            <span class="stat-sep">|</span>
+            <span class="stat-item">
+              <span class="stat-label">KDA</span>
+              <span class="stat-value" id="stat-kda">&mdash;</span>
+            </span>
+            <span class="stat-sep">|</span>
+            <span class="stat-item">
+              <span class="stat-label">Role</span>
+              <span class="stat-value" id="stat-role">&mdash;</span>
+            </span>
+          </div>
+        </div>
       </section>
 
       <section class="matches-section">
