@@ -215,7 +215,7 @@ const SUPPORT_ITEM_IDS = new Set([
 	1466, // Gleipnir (gungir)
 ]);
 
-type RoleBucket = 'Carry' | 'Mid' | 'Offlane' | 'Support';
+export type RoleBucket = 'Carry' | 'Mid' | 'Offlane' | 'Soft Support' | 'Hard Support';
 
 interface OpenDotaWL {
 	win: number;
@@ -232,10 +232,11 @@ interface OpenDotaMatchIdEntry {
 	match_id: number;
 }
 
-interface OpenDotaMatchPlayer {
+export interface OpenDotaMatchPlayer {
 	account_id: number | null;
 	player_slot: number;
 	gold_per_min: number;
+	lane_role: number | null; // 1 Safe, 2 Mid, 3 Off, 4 Jungle; null/absent if OpenDota hasn't parsed this match
 	item_0: number;
 	item_1: number;
 	item_2: number;
@@ -244,7 +245,7 @@ interface OpenDotaMatchPlayer {
 	item_5: number;
 }
 
-interface OpenDotaMatchDetail {
+export interface OpenDotaMatchDetail {
 	match_id: number;
 	players: OpenDotaMatchPlayer[];
 }
@@ -258,16 +259,18 @@ interface PlayerStatsRow {
 	deaths_sum: number;
 	assists_sum: number;
 	kda_n: number;
-	preferred_role: string | null;
+	preferred_role: string | null; // "Carry" / "Mid" / "Offlane" / "Soft Support" / "Hard Support", or
+	// coarse "Support" when neither support flavor alone clears MIN_CLASSIFIED_MATCHES but their sum does
 	preferred_role_games: number | null;
 	last_refreshed_at: number;
 }
 
 // Classifies a single match into a role bucket for the given account, using only
-// match-performance data (farm rank among that game's 5 teammates, plus whether a
-// support-only item shows up in the final build) — never hero identity, since the
-// same hero can be played in wildly different roles from one pub game to the next.
-function classifyMatchRole(match: OpenDotaMatchDetail, accountId: number): RoleBucket | null {
+// match-performance data (farm rank among that game's 5 teammates, whether a
+// support-only item shows up in the final build, and OpenDota's own parsed lane
+// when available) — never hero identity, since the same hero can be played in
+// wildly different roles from one pub game to the next.
+export function classifyMatchRole(match: OpenDotaMatchDetail, accountId: number): RoleBucket | null {
 	const me = match.players.find((p) => p.account_id === accountId);
 	if (!me) return null;
 
@@ -280,12 +283,51 @@ function classifyMatchRole(match: OpenDotaMatchDetail, accountId: number): RoleB
 	if (rank === 0) return null;
 
 	const items = [me.item_0, me.item_1, me.item_2, me.item_3, me.item_4, me.item_5];
-	if (items.some((id) => SUPPORT_ITEM_IDS.has(id))) return 'Support';
+	const isSupportTier = items.some((id) => SUPPORT_ITEM_IDS.has(id)) || rank === 4 || rank === 5;
 
-	if (rank === 1) return 'Carry';
-	if (rank === 2) return 'Mid';
-	if (rank === 3) return 'Offlane';
-	return 'Support'; // rank 4 or 5
+	if (!isSupportTier) {
+		if (rank === 1) return 'Carry';
+		if (rank === 2) return 'Mid';
+		return 'Offlane'; // rank === 3
+	}
+
+	// Prefer OpenDota's parsed lane when it unambiguously signals safe (Hard Support)
+	// or off lane (Soft Support). lane_role 2/4 on a support-tier player is inconclusive
+	// for this split — treat the same as unparsed and fall through to farm rank.
+	if (me.lane_role === 1) return 'Hard Support';
+	if (me.lane_role === 3) return 'Soft Support';
+
+	// Fallback (unparsed match, or lane_role 2/4): rank 5 -> Hard Support, rank 4 ->
+	// Soft Support. A support-item holder who ended up rank 1-3 ("farmed support")
+	// also falls here and defaults to Soft Support.
+	if (rank === 5) return 'Hard Support';
+	return 'Soft Support';
+}
+
+// Picks the winning role bucket from a per-match tally, requiring at least
+// MIN_CLASSIFIED_MATCHES games to report a result. If no single bucket clears that
+// bar but Soft + Hard Support combined do, reports the coarse "Support" label
+// instead of "not enough data" — the split can otherwise leave a genuinely
+// support-heavy player with neither flavor individually reaching the threshold.
+export function selectPreferredRole(tally: Record<RoleBucket, number>): { role: string | null; games: number } {
+	let role: string | null = null;
+	let games = 0;
+	for (const bucket of Object.keys(tally) as RoleBucket[]) {
+		if (tally[bucket] > games) {
+			role = bucket;
+			games = tally[bucket];
+		}
+	}
+
+	if (games < MIN_CLASSIFIED_MATCHES) {
+		const combinedSupport = tally['Soft Support'] + tally['Hard Support'];
+		if (combinedSupport >= MIN_CLASSIFIED_MATCHES) {
+			return { role: 'Support', games: combinedSupport };
+		}
+		return { role: null, games: 0 };
+	}
+
+	return { role, games };
 }
 
 async function fetchOpenDotaWL(accountId: string): Promise<OpenDotaWL> {
@@ -338,24 +380,19 @@ async function fetchAndComputeStats(accountId: string, steamid: string, now: num
 	}
 
 	const numericAccountId = Number(accountId);
-	const tally: Record<RoleBucket, number> = { Carry: 0, Mid: 0, Offlane: 0, Support: 0 };
+	const tally: Record<RoleBucket, number> = {
+		Carry: 0,
+		Mid: 0,
+		Offlane: 0,
+		'Soft Support': 0,
+		'Hard Support': 0,
+	};
 	for (const match of successfulDetails) {
 		const role = classifyMatchRole(match, numericAccountId);
 		if (role) tally[role] += 1;
 	}
 
-	let preferredRole: string | null = null;
-	let preferredRoleGames = 0;
-	for (const role of Object.keys(tally) as RoleBucket[]) {
-		if (tally[role] > preferredRoleGames) {
-			preferredRole = role;
-			preferredRoleGames = tally[role];
-		}
-	}
-	if (preferredRoleGames < MIN_CLASSIFIED_MATCHES) {
-		preferredRole = null;
-		preferredRoleGames = 0;
-	}
+	const { role: preferredRole, games: preferredRoleGames } = selectPreferredRole(tally);
 
 	// Separate kills/deaths/assists averages, not OpenDota's blended "kda" ratio —
 	// presented as an actual K/D/A triplet, same convention as each match row already uses.
