@@ -1,6 +1,10 @@
 (function () {
-  // Local dev default (wrangler dev). Swap to the deployed Worker URL after `wrangler deploy`.
-  const WORKER_BASE_URL = 'https://highground-steam-auth.hazriq-fitri95.workers.dev';
+  // Auto-detect local dev: serving the frontend from localhost talks to `wrangler dev`
+  // on its default port (8787); anything else talks to the deployed Worker.
+  const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const WORKER_BASE_URL = isLocalHost
+    ? `http://${window.location.hostname}:8787`
+    : 'https://highground-steam-auth.hazriq-fitri95.workers.dev';
   const TOKEN_KEY = 'hg-steam-token';
 
   const signinBtn = document.getElementById('steam-signin-btn');
