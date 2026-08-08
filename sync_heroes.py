@@ -19,6 +19,14 @@ DEFAULT_SOURCE = "https://api.opendota.com/api/heroes"
 FALLBACK_SOURCE = "https://raw.githubusercontent.com/odota/dotaconstants/master/build/heroes.json"
 DEFAULT_OUTPUT = Path("data/heroes.json")
 
+# OpenDota's /api/heroes carries no icon/img URLs at all. dotaconstants does, as
+# CDN-relative paths — and it's the only reliable source for them: Valve dropped
+# the npc_dota_hero_ filename prefix at some point (e.g. antimage, but
+# crystal_maiden keeps its underscore), so the current filenames aren't
+# derivable from the hero's internal name by string manipulation.
+ICON_SOURCE = FALLBACK_SOURCE
+CDN_BASE = "https://cdn.cloudflare.steamstatic.com"
+
 
 def fetch_json(url: str) -> Any:
     req = request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -44,11 +52,42 @@ def fetch_hero_data(primary_url: str) -> tuple[Any, str]:
     raise RuntimeError(f"Unable to fetch hero data from any configured source: {candidates}")
 
 
+def fetch_icon_map(url: str) -> dict[int, dict[str, str]]:
+    """dotaconstants' heroes.json is a dict keyed by hero id (unlike OpenDota's
+    array), each with relative icon/img paths. Rehost on Valve's CDN and drop
+    the trailing '?' Valve uses for cache-busting — the file resolves fine
+    without it."""
+    try:
+        data = fetch_json(url)
+    except RuntimeError as exc:
+        print(f"Warning: couldn't fetch icon/img URLs from {url}: {exc}")
+        return {}
+
+    if not isinstance(data, dict):
+        print(f"Warning: expected an object keyed by hero id at {url}, got {type(data).__name__}")
+        return {}
+
+    icon_map: dict[int, dict[str, str]] = {}
+    for hero in data.values():
+        if not isinstance(hero, dict) or not isinstance(hero.get("id"), int):
+            continue
+        icon_path = hero.get("icon")
+        img_path = hero.get("img")
+        icon_map[hero["id"]] = {
+            "icon": CDN_BASE + icon_path.split("?")[0] if icon_path else "",
+            "img": CDN_BASE + img_path.split("?")[0] if img_path else "",
+        }
+    return icon_map
+
+
 def load_local(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
 
-    with path.open("r", encoding="utf-8") as fh:
+    # utf-8-sig: the existing file was saved with a UTF-8 BOM (Windows-tool
+    # convention) — plain "utf-8" chokes on it, utf-8-sig strips it if present
+    # and is a no-op otherwise.
+    with path.open("r", encoding="utf-8-sig") as fh:
         data = json.load(fh)
 
     if not isinstance(data, list):
@@ -56,25 +95,34 @@ def load_local(path: Path) -> list[dict[str, Any]]:
     return data
 
 
-def normalize_hero(hero: dict[str, Any]) -> dict[str, Any]:
+def normalize_hero(hero: dict[str, Any], icon_map: dict[int, dict[str, str]]) -> dict[str, Any]:
+    hero_id = int(hero.get("id", 0))
     normalized = {
-        "id": int(hero.get("id", 0)),
+        "id": hero_id,
         "name": str(hero.get("name", "")),
         "localized_name": str(hero.get("localized_name", "")),
         "primary_attr": str(hero.get("primary_attr", "")),
         "attack_type": str(hero.get("attack_type", "")),
         "roles": list(hero.get("roles", [])) if isinstance(hero.get("roles", []), list) else [],
     }
+    icons = icon_map.get(hero_id)
+    if icons:
+        normalized["icon"] = icons["icon"]
+        normalized["img"] = icons["img"]
     return normalized
 
 
-def merge_heroes(remote_heroes: list[dict[str, Any]], local_heroes: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[str]]:
+def merge_heroes(
+    remote_heroes: list[dict[str, Any]],
+    local_heroes: list[dict[str, Any]],
+    icon_map: dict[int, dict[str, str]],
+) -> tuple[list[dict[str, Any]], list[str]]:
     local_by_id = {int(hero.get("id", -1)): hero for hero in local_heroes if isinstance(hero.get("id"), int)}
     merged: list[dict[str, Any]] = []
     changes: list[str] = []
 
     for hero in remote_heroes:
-        normalized = normalize_hero(hero)
+        normalized = normalize_hero(hero, icon_map)
         hero_id = normalized["id"]
         local_hero = local_by_id.get(hero_id)
 
@@ -118,8 +166,10 @@ def main() -> int:
     if not isinstance(remote_data, list):
         raise ValueError(f"Expected the source at {active_source} to be a JSON array")
 
+    icon_map = fetch_icon_map(ICON_SOURCE)
+
     local_data = load_local(output_path)
-    merged, changes = merge_heroes(remote_data, local_data)
+    merged, changes = merge_heroes(remote_data, local_data, icon_map)
 
     if args.dry_run:
         print(f"Source: {active_source}")

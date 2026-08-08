@@ -1,10 +1,24 @@
 (function () {
   // auth-guard.js has already bounced the no-token case before paint. What's left
-  // is the token that exists but no longer verifies — caught by the onChange
-  // handler at the bottom, once /auth/me has answered.
+  // is /auth/me's answer, once it arrives: a rejected token ('signed-out'), a
+  // network/timeout failure that says nothing about whether the token is still
+  // good ('error'), or success ('signed-in') — handled in onChange at the bottom.
   const auth = window.HGAuth;
   if (!auth) return;
 
+  const DATA_TIMEOUT_MS = 10000;
+
+  // Mirrors steam-auth.js's helper — a stalled request otherwise leaves the
+  // dashboard's loading state (or now, skeleton) up forever with nothing to show.
+  function fetchWithTimeout(url, options, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+  }
+
+  const profileSkeleton = document.getElementById('profile-skeleton');
+  const profileCard = document.getElementById('profile-card');
+  const profileError = document.getElementById('profile-error');
   const avatarEl = document.getElementById('dashboard-profile-avatar');
   const nameEl = document.getElementById('dashboard-profile-name');
   const steamidEl = document.getElementById('dashboard-profile-steamid');
@@ -82,6 +96,10 @@
       heroName.className = 'match-hero-name';
       heroName.textContent = hero?.localized_name || `Hero ${match.hero_id}`;
 
+      const role = document.createElement('span');
+      role.className = 'match-role';
+      role.textContent = match.role || '—';
+
       const result = document.createElement('span');
       result.className = 'match-result';
       result.textContent = win ? 'Win' : 'Loss';
@@ -98,7 +116,7 @@
       time.className = 'match-time';
       time.textContent = formatRelativeTime(match.start_time);
 
-      li.append(heroIcon, heroName, result, kda, duration, time);
+      li.append(heroIcon, heroName, role, result, kda, duration, time);
       matchesList.appendChild(li);
     }
     matchesList.hidden = false;
@@ -106,9 +124,11 @@
 
   async function fetchMatches(token) {
     try {
-      const res = await fetch(`${auth.workerBaseUrl}/dota/recent-matches`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithTimeout(
+        `${auth.workerBaseUrl}/dota/recent-matches`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        DATA_TIMEOUT_MS,
+      );
       if (!res.ok) throw new Error('request failed');
       const data = await res.json();
       await renderMatches(data.matches || []);
@@ -134,9 +154,11 @@
 
   async function fetchStats(token) {
     try {
-      const res = await fetch(`${auth.workerBaseUrl}/dota/stats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithTimeout(
+        `${auth.workerBaseUrl}/dota/stats`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        DATA_TIMEOUT_MS,
+      );
       if (!res.ok) throw new Error('request failed');
       const data = await res.json();
       renderStats(data);
@@ -151,13 +173,26 @@
     nameEl.textContent = profile.personaname || profile.steamid;
     steamidEl.textContent = `SteamID: ${profile.steamid}`;
     linkEl.href = `https://steamcommunity.com/profiles/${profile.steamid}`;
+    profileSkeleton.hidden = true;
+    profileCard.hidden = false;
   }
 
-  auth.onChange(({ signedIn, profile }) => {
-    if (!signedIn) {
+  auth.onChange(({ status, profile }) => {
+    if (status === 'signed-out') {
       window.location.replace('index.html');
       return;
     }
+
+    if (status === 'error') {
+      // Network/timeout, not a rejected token (steam-auth.js only clears the
+      // token on an actual 401) — a retry can still work, so say so plainly
+      // rather than redirecting away from a page the user may still be signed
+      // into.
+      profileSkeleton.hidden = true;
+      profileError.hidden = false;
+      return;
+    }
+
     renderProfile(profile);
     fetchStats(auth.getToken());
     fetchMatches(auth.getToken());

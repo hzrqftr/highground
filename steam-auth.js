@@ -15,11 +15,22 @@
   const nameEl = document.getElementById('steam-name');
   const signoutBtn = document.getElementById('steam-signout-btn');
 
+  const AUTH_TIMEOUT_MS = 10000;
+
+  // Plain fetch() never gives up on its own — without this, a stalled network
+  // request leaves the page waiting forever with no error and no data, which is
+  // worse than just failing. Every request below goes through this instead.
+  function fetchWithTimeout(url, options, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+  }
+
   const listeners = [];
-  function notifyChange(signedIn, profile) {
+  function notifyChange(status, profile) {
     for (const cb of listeners) {
       try {
-        cb({ signedIn, profile: profile || null });
+        cb({ status, signedIn: status === 'signed-in', profile: profile || null });
       } catch {
         // listener errors shouldn't break auth state handling
       }
@@ -29,7 +40,7 @@
   function showSignedOut() {
     for (const btn of signinBtns) btn.hidden = false;
     if (profileEl) profileEl.hidden = true;
-    notifyChange(false, null);
+    notifyChange('signed-out', null);
   }
 
   function showSignedIn(profile) {
@@ -37,7 +48,7 @@
     if (profileEl) profileEl.hidden = false;
     if (avatarEl) avatarEl.src = profile.avatar || '';
     if (nameEl) nameEl.textContent = profile.personaname || profile.steamid;
-    notifyChange(true, profile);
+    notifyChange('signed-in', profile);
   }
 
   async function refreshSession() {
@@ -46,19 +57,39 @@
       showSignedOut();
       return;
     }
+    let res;
     try {
-      const res = await fetch(`${WORKER_BASE_URL}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('session invalid');
-      showSignedIn(await res.json());
+      res = await fetchWithTimeout(
+        `${WORKER_BASE_URL}/auth/me`,
+        { headers: { Authorization: `Bearer ${token}` } },
+        AUTH_TIMEOUT_MS,
+      );
     } catch {
-      // Clear BEFORE notifying. A listener may redirect to the landing page, and
-      // auth-guard.js there checks for a token — leaving a rejected one in place
-      // would bounce it straight back here and loop.
+      // Network failure or timeout — we don't actually know the token is bad,
+      // so don't clear it or drop into the signed-out UI. A retry (e.g. a plain
+      // refresh) with the same token can still succeed once the network recovers.
+      notifyChange('error', null);
+      return;
+    }
+
+    if (res.status === 401) {
+      // The server itself rejected the token — this is a real sign-out. Clear
+      // BEFORE notifying: a listener may redirect to the landing page, and
+      // auth-guard.js there checks for a token — leaving a rejected one in
+      // place would bounce it straight back here and loop.
       localStorage.removeItem(TOKEN_KEY);
       showSignedOut();
+      return;
     }
+
+    if (!res.ok) {
+      // Some other server-side hiccup (5xx) — same reasoning as the network-error
+      // case above, the token itself hasn't been rejected.
+      notifyChange('error', null);
+      return;
+    }
+
+    showSignedIn(await res.json());
   }
 
   refreshSession();

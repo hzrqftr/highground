@@ -73,17 +73,34 @@
 
     <main class="shell portal">
       <section class="portal-hero dashboard-hero">
-        <div class="hero-content dashboard-profile-card">
+        <div class="hero-content dashboard-profile-skeleton" id="profile-skeleton" aria-hidden="true">
+          <span class="skeleton skeleton-avatar"></span>
+          <div class="skeleton-profile-info">
+            <span class="skeleton skeleton-line skeleton-line-lg"></span>
+            <span class="skeleton skeleton-line skeleton-line-sm"></span>
+            <span class="skeleton skeleton-line skeleton-line-sm"></span>
+          </div>
+        </div>
+
+        <div class="hero-content dashboard-profile-card" id="profile-card" hidden>
           <img class="dashboard-profile-avatar" id="dashboard-profile-avatar" alt="" />
           <div class="dashboard-profile-info">
-            <h1 id="dashboard-profile-name">Loading&hellip;</h1>
+            <h1 id="dashboard-profile-name"></h1>
             <p class="dashboard-profile-steamid" id="dashboard-profile-steamid"></p>
             <a class="dashboard-profile-link" id="dashboard-profile-link" href="#" target="_blank" rel="noopener">View Steam profile</a>
           </div>
         </div>
 
+        <p class="matches-status" id="profile-error" hidden>Couldn't verify your session right now. Try refreshing the page.</p>
+
         <div class="dashboard-hero-stats">
-          <p class="matches-status" id="stats-loading">Loading stats&hellip;</p>
+          <div class="stats-line-skeleton" id="stats-loading" aria-hidden="true">
+            <span class="skeleton skeleton-line skeleton-stat"></span>
+            <span class="stat-sep">|</span>
+            <span class="skeleton skeleton-line skeleton-stat"></span>
+            <span class="stat-sep">|</span>
+            <span class="skeleton skeleton-line skeleton-stat"></span>
+          </div>
           <p class="matches-status" id="stats-empty" hidden>No stats available yet. Make sure "Expose Public Match Data" is enabled in your Dota 2 settings.</p>
           <p class="matches-status" id="stats-error" hidden>Couldn't load stats right now. Try refreshing the page.</p>
 
@@ -109,7 +126,13 @@
       <section class="matches-section">
         <h2 class="matches-heading">Recent matches</h2>
 
-        <p class="matches-status" id="matches-loading">Loading recent matches&hellip;</p>
+        <ul class="matches-list-skeleton" id="matches-loading" aria-hidden="true">
+          <li class="skeleton-match-row"><span class="skeleton skeleton-match-icon"></span><span class="skeleton skeleton-line skeleton-match-name"></span><span class="skeleton skeleton-line skeleton-match-meta"></span></li>
+          <li class="skeleton-match-row"><span class="skeleton skeleton-match-icon"></span><span class="skeleton skeleton-line skeleton-match-name"></span><span class="skeleton skeleton-line skeleton-match-meta"></span></li>
+          <li class="skeleton-match-row"><span class="skeleton skeleton-match-icon"></span><span class="skeleton skeleton-line skeleton-match-name"></span><span class="skeleton skeleton-line skeleton-match-meta"></span></li>
+          <li class="skeleton-match-row"><span class="skeleton skeleton-match-icon"></span><span class="skeleton skeleton-line skeleton-match-name"></span><span class="skeleton skeleton-line skeleton-match-meta"></span></li>
+          <li class="skeleton-match-row"><span class="skeleton skeleton-match-icon"></span><span class="skeleton skeleton-line skeleton-match-name"></span><span class="skeleton skeleton-line skeleton-match-meta"></span></li>
+        </ul>
         <p class="matches-status" id="matches-empty" hidden>No recent Dota 2 matches found. Make sure "Expose Public Match Data" is enabled in your Dota 2 settings.</p>
         <p class="matches-status" id="matches-error" hidden>Couldn't load recent matches right now. Try refreshing the page.</p>
 

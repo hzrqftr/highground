@@ -574,6 +574,56 @@ main {
   max-width: none;
 }
 
+/* .hero-content sets its own display, so — same trap as .stats-grid earlier —
+   the [hidden] UA default needs an explicit override to actually win. */
+.dashboard-hero .hero-content[hidden] {
+  display: none;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.skeleton {
+  background: var(--border);
+  border-radius: 4px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-line {
+  display: block;
+  height: 0.85rem;
+  width: 100px;
+}
+
+.skeleton-line-lg {
+  width: 150px;
+  height: 1.3rem;
+}
+
+.skeleton-line-sm {
+  width: 110px;
+}
+
 .dashboard-hero-stats {
   flex-shrink: 0;
   text-align: right;
@@ -675,6 +725,21 @@ main {
   white-space: nowrap;
 }
 
+.stats-line-skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.stats-line-skeleton[hidden] {
+  display: none;
+}
+
+.skeleton-stat {
+  width: 56px;
+}
+
 .matches-list {
   list-style: none;
   margin: 0;
@@ -733,6 +798,13 @@ main {
   white-space: nowrap;
 }
 
+.match-role {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
 .match-result {
   font-family: var(--font-mono);
   font-weight: 600;
@@ -756,6 +828,46 @@ main {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   white-space: nowrap;
+}
+
+.matches-list-skeleton {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.matches-list-skeleton[hidden] {
+  display: none;
+}
+
+.skeleton-match-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+}
+
+.skeleton-match-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.skeleton-match-name {
+  flex: 1;
+  max-width: 140px;
+}
+
+.skeleton-match-meta {
+  width: 64px;
 }
 
 /* Legal pages. Sits inside .shell as an inner element rather than sharing the
