@@ -6,7 +6,11 @@
   const auth = window.HGAuth;
   if (!auth) return;
 
-  const DATA_TIMEOUT_MS = 10000;
+  // The Worker's own worst case on a cold cache is two sequential timeout-bound
+  // phases (~8s each — see OPENDOTA_TIMEOUT_MS in the Worker) plus network
+  // overhead, so this needs real headroom above that or the browser gives up
+  // on a request that would have succeeded.
+  const DATA_TIMEOUT_MS = 20000;
 
   // Mirrors steam-auth.js's helper — a stalled request otherwise leaves the
   // dashboard's loading state (or now, skeleton) up forever with nothing to show.
@@ -14,6 +18,30 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
+  }
+
+  // A cold cache-miss can legitimately take several seconds even when nothing
+  // is wrong — this is a courtesy nudge, not an error state. It only ever
+  // appears if the page is STILL showing a skeleton once the threshold hits,
+  // and disappears the moment everything actually resolves (success or error).
+  const SLOW_LOAD_THRESHOLD_MS = 12000;
+  const slowLoadBanner = document.getElementById('slow-load-banner');
+  let slowLoadTimer = null;
+
+  function isStillLoading() {
+    return !profileSkeleton.hidden || !statsLoading.hidden || !matchesLoading.hidden;
+  }
+
+  function maybeHideSlowLoadBanner() {
+    if (isStillLoading()) return;
+    slowLoadBanner.hidden = true;
+    clearTimeout(slowLoadTimer);
+  }
+
+  function watchForSlowLoad() {
+    slowLoadTimer = setTimeout(() => {
+      if (isStillLoading()) slowLoadBanner.hidden = false;
+    }, SLOW_LOAD_THRESHOLD_MS);
   }
 
   const profileSkeleton = document.getElementById('profile-skeleton');
@@ -72,6 +100,7 @@
   async function renderMatches(matches) {
     const heroes = await loadHeroes();
     matchesLoading.hidden = true;
+    maybeHideSlowLoadBanner();
 
     if (!matches.length) {
       matchesEmpty.hidden = false;
@@ -135,11 +164,13 @@
     } catch {
       matchesLoading.hidden = true;
       matchesError.hidden = false;
+      maybeHideSlowLoadBanner();
     }
   }
 
   function renderStats(stats) {
     statsLoading.hidden = true;
+    maybeHideSlowLoadBanner();
 
     if (stats.win_rate === null) {
       statsEmpty.hidden = false;
@@ -165,6 +196,7 @@
     } catch {
       statsLoading.hidden = true;
       statsError.hidden = false;
+      maybeHideSlowLoadBanner();
     }
   }
 
@@ -175,6 +207,7 @@
     linkEl.href = `https://steamcommunity.com/profiles/${profile.steamid}`;
     profileSkeleton.hidden = true;
     profileCard.hidden = false;
+    maybeHideSlowLoadBanner();
   }
 
   auth.onChange(({ status, profile }) => {
@@ -193,6 +226,7 @@
       return;
     }
 
+    watchForSlowLoad();
     renderProfile(profile);
     fetchStats(auth.getToken());
     fetchMatches(auth.getToken());

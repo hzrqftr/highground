@@ -687,6 +687,11 @@ main {
   font-size: 0.88rem;
 }
 
+.slow-load-banner {
+  text-align: center;
+  font-size: 0.82rem;
+}
+
 .stats-line {
   display: flex;
   align-items: baseline;
