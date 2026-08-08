@@ -1,11 +1,9 @@
 (function () {
+  // auth-guard.js has already bounced the no-token case before paint. What's left
+  // is the token that exists but no longer verifies — caught by the onChange
+  // handler at the bottom, once /auth/me has answered.
   const auth = window.HGAuth;
-
-  // No token at all -> bounce immediately, don't wait on the async session check.
-  if (!auth || !auth.getToken()) {
-    window.location.replace('index.html');
-    return;
-  }
+  if (!auth) return;
 
   const avatarEl = document.getElementById('dashboard-profile-avatar');
   const nameEl = document.getElementById('dashboard-profile-name');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-hg-page="app">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,119 +10,104 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <!-- Runs before paint: consumes #token= from the Steam return, and bounces
+         a signed-out visitor to the landing page without a flash of this one. -->
+    <script src="auth-guard.js"></script>
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-inner">
-          <div class="sidebar-header">
-              <div class="sidebar-brand">
-              <div class="brand-sigil"><img src="assets/icons/hg-blue.png" alt="Highground" style="width:36px;height:36px;display:block;" /></div>
-              <span class="brand-name">Highground</span>
-            </div>
+    <header class="site-header">
+      <div class="shell site-header-inner">
+        <a class="brand" href="dashboard.html">
+          <img class="brand-sigil" src="assets/icons/hg-blue.png" alt="" />
+          <span class="brand-name">Highground</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Main navigation">
+          <ul>
+            <li>
+              <a href="dashboard.html" class="nav-link active" aria-current="page">
+                <span class="nav-label">Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <span class="nav-soon" aria-disabled="true">
+                <span class="nav-label">Draft Board</span>
+                <span class="soon-marker">Soon</span>
+              </span>
+            </li>
+            <li>
+              <span class="nav-soon" aria-disabled="true">
+                <span class="nav-label">Hero Notes</span>
+                <span class="soon-marker">Soon</span>
+              </span>
+            </li>
+            <li>
+              <span class="nav-soon" aria-disabled="true">
+                <span class="nav-label">Build Planner</span>
+                <span class="soon-marker">Soon</span>
+              </span>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="account-widget" id="account-widget">
+          <div class="steam-profile" id="steam-profile" hidden>
+            <img class="steam-avatar" id="steam-avatar" alt="" />
+            <span class="steam-name" id="steam-name"></span>
+            <button class="steam-signout-btn" id="steam-signout-btn" type="button" aria-label="Sign out" title="Sign out">×</button>
           </div>
-
-          <nav class="sidebar-nav" aria-label="Main navigation">
-            <div class="nav-group">
-              <p class="nav-group-label">Navigation</p>
-              <ul>
-                <li>
-                  <a href="index.html" class="nav-link home-link">
-                    <span class="nav-icon">🏠</span>
-                    <span class="nav-label">Home</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="dashboard.html" class="nav-link active" id="dashboard-nav-link" aria-current="page">
-                    <span class="nav-icon">🧭</span>
-                    <span class="nav-label">Dashboard</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">🎯</span>
-                    <span class="nav-label">Draft Board</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">📋</span>
-                    <span class="nav-label">Hero Notes</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-label">Match Log</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-label">Build Planner</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </nav>
-
         </div>
-      </aside>
-
-      <div class="main-area">
-        <main class="portal">
-          <section class="portal-hero dashboard-hero">
-            <div class="hero-topbar">
-              <button class="sidebar-hamburger" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
-              <div class="account-widget" id="account-widget">
-                <button class="steam-signin-btn" id="steam-signin-btn" type="button">
-                  <img class="steam-icon" src="assets/icons/steam-logo.svg" alt="" />
-                  <span>Sign in</span>
-                </button>
-                <div class="steam-profile" id="steam-profile" hidden>
-                  <img class="steam-avatar" id="steam-avatar" alt="" />
-                  <span class="steam-name" id="steam-name"></span>
-                  <button class="steam-signout-btn" id="steam-signout-btn" type="button" aria-label="Sign out" title="Sign out">×</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="hero-content dashboard-profile-card">
-              <img class="dashboard-profile-avatar" id="dashboard-profile-avatar" alt="" />
-              <div class="dashboard-profile-info">
-                <h1 id="dashboard-profile-name">Loading&hellip;</h1>
-                <p class="dashboard-profile-steamid" id="dashboard-profile-steamid"></p>
-                <a class="dashboard-profile-link" id="dashboard-profile-link" href="#" target="_blank" rel="noopener">View Steam profile</a>
-              </div>
-            </div>
-          </section>
-
-          <section class="matches-section">
-            <h2 class="matches-heading">Recent Dota 2 Matches</h2>
-
-            <p class="matches-status" id="matches-loading">Loading recent matches&hellip;</p>
-            <p class="matches-status" id="matches-empty" hidden>No recent Dota 2 matches found. Make sure "Expose Public Match Data" is enabled in your Dota 2 settings.</p>
-            <p class="matches-status" id="matches-error" hidden>Couldn't load recent matches right now. Try refreshing the page.</p>
-
-            <ul class="matches-list" id="matches-list" hidden></ul>
-          </section>
-        </main>
-
-        <footer>
-          <div class="footer-text">
-            <p>Highground is your competitive advantage. Alpha release coming soon.</p>
-            <p class="footer-disclaimer">
-              Highground is an unofficial, non-commercial fan project and is not affiliated with, endorsed, or sponsored by Valve Corporation.
-              Dota, Dota 2, Steam, and associated logos are trademarks and/or registered trademarks of Valve Corporation.
-              Hero and item data are sourced from Valve's public Dota 2 assets. &middot; <a href="privacy.html">Privacy</a>
-            </p>
-          </div>
-          <span class="footer-badge">alpha</span>
-        </footer>
       </div>
-    </div>
+      <svg class="elevation-rule" viewBox="0 0 1440 6" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="hg-ridge" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="currentColor" stop-opacity="0.1" />
+            <stop offset="0.55" stop-color="currentColor" stop-opacity="0.35" />
+            <stop offset="1" stop-color="currentColor" stop-opacity="1" />
+          </linearGradient>
+        </defs>
+        <polyline points="0,3 1440,3"
+                  fill="none" stroke="url(#hg-ridge)" stroke-width="1" vector-effect="non-scaling-stroke" />
+      </svg>
+    </header>
 
-    <script src="script.js"></script>
+    <main class="shell portal">
+      <section class="portal-hero dashboard-hero">
+        <div class="hero-content dashboard-profile-card">
+          <img class="dashboard-profile-avatar" id="dashboard-profile-avatar" alt="" />
+          <div class="dashboard-profile-info">
+            <h1 id="dashboard-profile-name">Loading&hellip;</h1>
+            <p class="dashboard-profile-steamid" id="dashboard-profile-steamid"></p>
+            <a class="dashboard-profile-link" id="dashboard-profile-link" href="#" target="_blank" rel="noopener">View Steam profile</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="matches-section">
+        <h2 class="matches-heading">Recent matches</h2>
+
+        <p class="matches-status" id="matches-loading">Loading recent matches&hellip;</p>
+        <p class="matches-status" id="matches-empty" hidden>No recent Dota 2 matches found. Make sure "Expose Public Match Data" is enabled in your Dota 2 settings.</p>
+        <p class="matches-status" id="matches-error" hidden>Couldn't load recent matches right now. Try refreshing the page.</p>
+
+        <ul class="matches-list" id="matches-list" hidden></ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell site-footer-inner">
+        <div class="footer-text">
+          <p>Highground is your competitive advantage. Alpha release coming soon.</p>
+          <p class="footer-disclaimer">
+            Highground is an unofficial, non-commercial fan project and is not affiliated with, endorsed, or sponsored by Valve Corporation.
+            Dota, Dota 2, Steam, and associated logos are trademarks and/or registered trademarks of Valve Corporation.
+            Hero and item data are sourced from Valve's public Dota 2 assets. &middot; <a href="privacy.html">Privacy</a>
+          </p>
+        </div>
+        <span class="footer-badge">alpha</span>
+      </div>
+    </footer>
+
     <script src="steam-auth.js"></script>
     <script src="dashboard.js"></script>
   </body>

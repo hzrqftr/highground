@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-hg-page="landing">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,135 +10,99 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <!-- Runs before paint: a signed-in visitor goes straight to the dashboard
+         and never sees this page. -->
+    <script src="auth-guard.js"></script>
   </head>
   <body>
-    <div class="app-shell">
-      <aside class="sidebar" id="sidebar">
-        <div class="sidebar-inner">
-          <div class="sidebar-header">
-              <div class="sidebar-brand">
-              <div class="brand-sigil"><img src="assets/icons/hg-blue.png" alt="Highground" style="width:36px;height:36px;display:block;" /></div>
-              <span class="brand-name">Highground</span>
-            </div>
-          </div>
+    <header class="site-header">
+      <div class="shell site-header-inner">
+        <a class="brand" href="index.html">
+          <img class="brand-sigil" src="assets/icons/hg-blue.png" alt="" />
+          <span class="brand-name">Highground</span>
+        </a>
 
-          <nav class="sidebar-nav" aria-label="Main navigation">
-            <div class="nav-group">
-              <p class="nav-group-label">Navigation</p>
-              <ul>
-                <li>
-                  <a href="index.html" class="nav-link home-link active" aria-current="page">
-                    <span class="nav-icon">🏠</span>
-                    <span class="nav-label">Home</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="dashboard.html" class="nav-link" id="dashboard-nav-link" hidden>
-                    <span class="nav-icon">🧭</span>
-                    <span class="nav-label">Dashboard</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">🎯</span>
-                    <span class="nav-label">Draft Board</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">📋</span>
-                    <span class="nav-label">Hero Notes</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">📊</span>
-                    <span class="nav-label">Match Log</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" class="nav-link">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-label">Build Planner</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </nav>
-
+        <div class="account-widget" id="account-widget">
+          <button class="steam-signin-btn" data-steam-signin type="button">
+            <img class="steam-icon" src="assets/icons/steam-logo.svg" alt="" />
+            <span>Sign in</span>
+          </button>
         </div>
-      </aside>
-
-      <div class="main-area">
-        <main class="portal">
-          <section class="portal-hero">
-            <div class="hero-topbar">
-              <button class="sidebar-hamburger" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
-              <div class="account-widget" id="account-widget">
-                <button class="steam-signin-btn" id="steam-signin-btn" type="button">
-                  <img class="steam-icon" src="assets/icons/steam-logo.svg" alt="" />
-                  <span>Sign in</span>
-                </button>
-                <div class="steam-profile" id="steam-profile" hidden>
-                  <img class="steam-avatar" id="steam-avatar" alt="" />
-                  <span class="steam-name" id="steam-name"></span>
-                  <button class="steam-signout-btn" id="steam-signout-btn" type="button" aria-label="Sign out" title="Sign out">×</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="hero-content">
-              <h1>Take the high ground</h1>
-              <p>Build your edge with tactical drafting, hero analysis, and item planning tools designed for competitive play.</p>
-            </div>
-          </section>
-
-          <div class="portal-grid">
-            <a class="portal-card" href="#">
-              <div class="card-icon">🎯</div>
-              <h3>Draft Board</h3>
-              <p>Plan hero picks, track counterplay, and lock in your lane priorities before the game starts.</p>
-              <span class="card-cta">Open</span>
-            </a>
-
-            <a class="portal-card" href="#">
-              <div class="card-icon">📋</div>
-              <h3>Hero Notes</h3>
-              <p>Store role-specific tips, item timings, and matchup breakdowns for every hero in your pool.</p>
-              <span class="card-cta">Open</span>
-            </a>
-
-            <a class="portal-card" href="#">
-              <div class="card-icon">📊</div>
-              <h3>Match Log</h3>
-              <p>Track your games, learn from replays, and level up your competitive edge with every match.</p>
-              <span class="card-cta">Open</span>
-            </a>
-
-            <a class="portal-card" href="#">
-              <div class="card-icon">⚙️</div>
-              <h3>Build Planner</h3>
-              <p>Map out item builds, skill order priorities, and timing windows for your heroes and strategies.</p>
-              <span class="card-cta">Open</span>
-            </a>
-          </div>
-        </main>
-
-        <footer>
-          <div class="footer-text">
-            <p>Highground is your competitive advantage. Alpha release coming soon.</p>
-            <p class="footer-disclaimer">
-              Highground is an unofficial, non-commercial fan project and is not affiliated with, endorsed, or sponsored by Valve Corporation.
-              Dota, Dota 2, Steam, and associated logos are trademarks and/or registered trademarks of Valve Corporation.
-              Hero and item data are sourced from Valve's public Dota 2 assets. &middot; <a href="privacy.html">Privacy</a>
-            </p>
-          </div>
-          <span class="footer-badge">alpha</span>
-        </footer>
       </div>
-    </div>
+      <svg class="elevation-rule" viewBox="0 0 1440 6" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="hg-ridge" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="currentColor" stop-opacity="0.1" />
+            <stop offset="0.55" stop-color="currentColor" stop-opacity="0.35" />
+            <stop offset="1" stop-color="currentColor" stop-opacity="1" />
+          </linearGradient>
+        </defs>
+        <polyline points="0,3 1440,3"
+                  fill="none" stroke="url(#hg-ridge)" stroke-width="1" vector-effect="non-scaling-stroke" />
+      </svg>
+    </header>
 
-    <script src="script.js"></script>
+    <main class="shell portal">
+      <section class="portal-hero landing-hero">
+        <div class="hero-content">
+          <h1>Take the <em>high ground</em></h1>
+          <p>Sign in with Steam to see your recent Dota 2 matches. Draft boards, hero notes, and build planning come next.</p>
+          <button class="hero-cta" data-steam-signin type="button">
+            <img class="steam-icon" src="assets/icons/steam-logo.svg" alt="" />
+            <span>Sign in</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="portal-grid">
+        <div class="portal-card">
+          <div class="card-top">
+            <span class="card-status is-live">Live</span>
+          </div>
+          <h3>Recent matches</h3>
+          <p>Your last five games with hero, result, K/D/A and duration, read straight from your Steam profile.</p>
+        </div>
+
+        <div class="portal-card is-soon">
+          <div class="card-top">
+            <span class="card-status">Soon</span>
+          </div>
+          <h3>Draft Board</h3>
+          <p>Plan hero picks, track counterplay, and lock in lane priorities before the game starts.</p>
+        </div>
+
+        <div class="portal-card is-soon">
+          <div class="card-top">
+            <span class="card-status">Soon</span>
+          </div>
+          <h3>Hero Notes</h3>
+          <p>Keep role-specific tips, item timings, and matchup breakdowns for every hero in your pool.</p>
+        </div>
+
+        <div class="portal-card is-soon">
+          <div class="card-top">
+            <span class="card-status">Soon</span>
+          </div>
+          <h3>Build Planner</h3>
+          <p>Map out item builds, skill order, and the timing windows each of your heroes plays around.</p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell site-footer-inner">
+        <div class="footer-text">
+          <p>Highground is your competitive advantage. Alpha release coming soon.</p>
+          <p class="footer-disclaimer">
+            Highground is an unofficial, non-commercial fan project and is not affiliated with, endorsed, or sponsored by Valve Corporation.
+            Dota, Dota 2, Steam, and associated logos are trademarks and/or registered trademarks of Valve Corporation.
+            Hero and item data are sourced from Valve's public Dota 2 assets. &middot; <a href="privacy.html">Privacy</a>
+          </p>
+        </div>
+        <span class="footer-badge">alpha</span>
+      </div>
+    </footer>
+
     <script src="steam-auth.js"></script>
   </body>
 </html>
